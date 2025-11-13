@@ -31,13 +31,50 @@ async function run() {
 
         const db = client.db('habit_db');
         const habitsCollection = db.collection('habits');
+        const myhabitsCollection = db.collection('myhabits');
 
+        // Send habit data to DB
         app.post('/habits', async (req, res) => {
             const newHabit = req.body;
             const result = await habitsCollection.insertOne(newHabit);
             res.send(result);
         })
 
+        // Get All habit data from DB
+        app.get('/habits', async (req, res) => {
+            // const projectFields = { title: 1, description: 1, category: 1 }
+            // const cursor = habitsCollection.find().sort({ createdAt: 1 }).limit(6).project(projectFields);
+
+            // get find habit under Specific Email
+            console.log(req.query);
+            const email = req.query.email;
+            const query = {}
+            if(email){
+                query.email = email;
+            }
+
+            const cursor = habitsCollection.find(query);
+            const result = await cursor.toArray();
+            res.send(result);
+        })
+
+        // Get Single Habit data from DB
+        app.get('/habits/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await habitsCollection.findOne(query);
+            res.send(result);
+        })
+
+        // Delete single habit data from DB using id
+        app.delete('/habits/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await habitsCollection.deleteOne(query);
+            res.send(result);
+        })
+
+        // Edit Habit data & update with changed info to DB using id
         app.patch('/habits/:id', async (req, res) => {
             const id = req.params.id;
             const updatedEditHabit = req.body;
@@ -53,6 +90,21 @@ async function run() {
             const result = await habitsCollection.updateOne(query, update);
             res.send(result);
 
+        })
+
+        // My Habit apis data get
+        app.get('/myhabits', async(req, res)=>{
+            
+            // Specific user habit find/get
+            const email = req.query.email;
+            const query = {}
+            if (email) {
+                query.user_email = email;
+            }
+
+            const cursor = myhabitsCollection.find(query);
+            const result = await cursor.toArray();
+            res.send(result);
         })
 
 
