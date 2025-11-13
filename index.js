@@ -29,7 +29,8 @@ async function run() {
     try {
         await client.connect();
 
-        
+        const db = client.db('habit_db');
+        const habitsCollection = db.collection('habits');
 
 
         await client.db("admin").command({ ping: 1 });
