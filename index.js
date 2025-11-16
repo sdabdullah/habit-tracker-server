@@ -31,25 +31,37 @@ async function run() {
 
         const db = client.db('habit_db');
         const habitsCollection = db.collection('habits');
-        const myhabitsCollection = db.collection('myhabits');
+        // const myhabitsCollection = db.collection('myhabits');
 
-        // Send habit data to DB
+        // Add habit data to DB
         app.post('/habits', async (req, res) => {
             const newHabit = req.body;
             const result = await habitsCollection.insertOne(newHabit);
             res.send(result);
         })
 
-        // Get All habit data from DB
+        // Get recently Added habits
+        app.get('/recent-habits', async (req, res) => {
+            const cursor = habitsCollection.find().sort({ created_at: -1 }).limit(6);
+            const result = await cursor.toArray();
+            res.send(result);
+        })
+
+        // Brows Public Habit API
+        app.get('/public-habits', async (req, res) => {
+            const cursor = habitsCollection.find();
+            const result = await cursor.toArray();
+            res.send(result);
+        })
+
+
+        // Get habit by email from DB
         app.get('/habits', async (req, res) => {
-            // const projectFields = { title: 1, description: 1, category: 1 }
-            // const cursor = habitsCollection.find().sort({ createdAt: 1 }).limit(6).project(projectFields);
 
             // get find habit under Specific Email
-            console.log(req.query);
             const email = req.query.email;
             const query = {}
-            if(email){
+            if (email) {
                 query.email = email;
             }
 
@@ -57,6 +69,11 @@ async function run() {
             const result = await cursor.toArray();
             res.send(result);
         })
+
+
+        
+
+
 
         // Get Single Habit data from DB
         app.get('/habits/:id', async (req, res) => {
@@ -67,6 +84,7 @@ async function run() {
         })
 
         // Delete single habit data from DB using id
+
         app.delete('/habits/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) }
@@ -93,19 +111,19 @@ async function run() {
         })
 
         // My Habit apis data get
-        app.get('/myhabits', async(req, res)=>{
-            
-            // Specific user habit find/get
-            const email = req.query.email;
-            const query = {}
-            if (email) {
-                query.user_email = email;
-            }
+        // app.get('/myhabits', async (req, res) => {
 
-            const cursor = myhabitsCollection.find(query);
-            const result = await cursor.toArray();
-            res.send(result);
-        })
+        //     // Specific user habit find/get
+        //     const email = req.query.email;
+        //     const query = {}
+        //     if (email) {
+        //         query.user_email = email;
+        //     }
+
+        //     const cursor = myhabitsCollection.find(query);
+        //     const result = await cursor.toArray();
+        //     res.send(result);
+        // })
 
 
         await client.db("admin").command({ ping: 1 });
