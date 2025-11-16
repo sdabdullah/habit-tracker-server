@@ -1,15 +1,18 @@
 const express = require('express');
 const cors = require('cors');
+require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const port = process.env.PORT || 3000;
+
 
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
-const uri = "mongodb+srv://habitTrackerDB:QBV24f2UE6Y1Hymr@cluster0.xligdge.mongodb.net/?appName=Cluster0";
+// const uri = "mongodb+srv://habitTrackerDB:QBV24f2UE6Y1Hymr@cluster0.xligdge.mongodb.net/?appName=Cluster0";
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.xligdge.mongodb.net/?appName=Cluster0`;
 
 // MongoClient
 const client = new MongoClient(uri, {
@@ -72,16 +75,13 @@ async function run() {
 
 
         
-
-
-
-        // Get Single Habit data from DB
-        app.get('/habits/:id', async (req, res) => {
-            const id = req.params.id;
-            const query = { _id: new ObjectId(id) }
-            const result = await habitsCollection.findOne(query);
-            res.send(result);
-        })
+        // Get Single Habit for habit details page data from DB
+        // app.get('/habits/:id', async (req, res) => {
+        //     const id = req.params.id;
+        //     const query = { _id: new ObjectId(id) }
+        //     const result = await habitsCollection.findOne(query);
+        //     res.send(result);
+        // })
 
         // Delete single habit data from DB using id
 
